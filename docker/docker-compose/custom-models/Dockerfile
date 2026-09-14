@@ -9,6 +9,11 @@
 # use end up in the final image.
 FROM ghcr.io/vectorize-io/hindsight:latest-slim
 
+# 声明代理参数（构建时可通过 --build-arg 覆盖）
+ARG http_proxy=http://172.17.0.1:10808
+ARG https_proxy=http://172.17.0.1:10808
+ARG no_proxy=localhost,127.0.0.1
+
 # Install the local-ml deps required to load sentence-transformers /
 # cross-encoder models at runtime. Pinned ranges mirror hindsight-api-slim's
 # `local-ml` extra in hindsight-api-slim/pyproject.toml. Use `uv pip
