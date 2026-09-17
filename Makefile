@@ -9,18 +9,25 @@ DOCKER_TARGET ?= api-only
 DOCKER_PLATFORM ?= linux/amd64
 DOCKER_BUILD_ARGS ?=
 
-# Proxy arguments are optional. Set them on the command line or in the
-# environment when the builder needs a proxy, for example:
-#   make docker-build HTTP_PROXY=http://172.17.0.1:10808 HTTPS_PROXY=http://172.17.0.1:10808
+# Proxy arguments are deliberately separate from the host's HTTP_PROXY
+# variables. A host proxy such as 127.0.0.1:10808 points back to the build
+# container when passed through, and therefore cannot be reached from Docker.
+# Set these explicitly when the builder needs the host proxy, for example:
+#   make docker-build DOCKER_HTTP_PROXY=http://172.17.0.1:10808 \
+#     DOCKER_HTTPS_PROXY=http://172.17.0.1:10808
+DOCKER_HTTP_PROXY ?=
+DOCKER_HTTPS_PROXY ?=
+DOCKER_NO_PROXY ?=
+
 PROXY_BUILD_ARGS :=
-ifneq ($(strip $(HTTP_PROXY)),)
-PROXY_BUILD_ARGS += --build-arg http_proxy=$(HTTP_PROXY)
+ifneq ($(strip $(DOCKER_HTTP_PROXY)),)
+PROXY_BUILD_ARGS += --build-arg http_proxy=$(DOCKER_HTTP_PROXY)
 endif
-ifneq ($(strip $(HTTPS_PROXY)),)
-PROXY_BUILD_ARGS += --build-arg https_proxy=$(HTTPS_PROXY)
+ifneq ($(strip $(DOCKER_HTTPS_PROXY)),)
+PROXY_BUILD_ARGS += --build-arg https_proxy=$(DOCKER_HTTPS_PROXY)
 endif
-ifneq ($(strip $(NO_PROXY)),)
-PROXY_BUILD_ARGS += --build-arg no_proxy=$(NO_PROXY)
+ifneq ($(strip $(DOCKER_NO_PROXY)),)
+PROXY_BUILD_ARGS += --build-arg no_proxy=$(DOCKER_NO_PROXY)
 endif
 
 .DEFAULT_GOAL := help
